@@ -1,0 +1,31 @@
+-- USERS TABLE
+-- Stores login credentials for system users (admin/teacher)
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,          -- Auto-increment unique ID
+    username VARCHAR(50) UNIQUE NOT NULL,  -- Login username (must be unique)
+    password VARCHAR(100) NOT NULL   -- Login password
+);
+
+
+
+-- STUDENTS TABLE
+-- Stores student basic information
+
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,               -- Auto-increment student ID
+    name VARCHAR(100) NOT NULL,           -- Student full name
+    roll_no VARCHAR(20) UNIQUE NOT NULL,  -- Unique roll number
+    department VARCHAR(50) NOT NULL       -- Department (CSE, ECE, etc.)
+);
+
+
+-- ATTENDANCE TABLE
+-- Stores daily attendance of students
+
+CREATE TABLE attendance (
+    id SERIAL PRIMARY KEY,             -- Unique attendance record ID
+    roll_no VARCHAR(20) NOT NULL,       -- Student roll number
+    date DATE NOT NULL,                 -- Attendance date
+    present BOOLEAN NOT NULL            -- true = present, false = absent
+);
