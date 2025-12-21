@@ -48,14 +48,21 @@ app.get("/attendance", (req, res) => {
  */
 app.post("/signup", (req, res) => {
     const { username, password } = req.body;
+    // Classpath: current dir for AttendanceDB, plus postgresql.jar
+    // Note: Assuming Windows environment where separator is ';'
+    const cmd = `java -cp "../java-backend;../java-backend/postgresql.jar" AttendanceDB signup "${username}" "${password}"`;
 
-    const cmd = `java -cp ../java-backend AttendanceDB signup ${username} ${password}`;
+    exec(cmd, (err, stdout, stderr) => {
+        console.log("Java Output (STDOUT):", stdout);
+        console.error("Java Output (STDERR):", stderr);
+        if (err) console.error("Exec Error:", err);
 
-    exec(cmd, (err, stdout) => {
         if (stdout.includes("SIGNUP_SUCCESS")) {
             res.render("login", { msg: "Signup successful. Please login." });
         } else {
-            res.render("signup", { msg: "Signup failed." });
+            // Debugging: Show ALL output
+            const errorMsg = `Signup failed.\nSTDOUT: ${stdout}\nSTDERR: ${stderr}\nERR: ${err ? err.message : ''}`;
+            res.render("signup", { msg: errorMsg });
         }
     });
 });
@@ -65,10 +72,10 @@ app.post("/signup", (req, res) => {
  */
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
-
-    const cmd = `java -cp ../java-backend AttendanceDB login ${username} ${password}`;
+    const cmd = `java -cp "../java-backend;../java-backend/postgresql.jar" AttendanceDB login "${username}" "${password}"`;
 
     exec(cmd, (err, stdout) => {
+        console.log("Java Output:", stdout);
         if (stdout.includes("LOGIN_SUCCESS")) {
             res.render("dashboard");
         } else {
@@ -82,14 +89,15 @@ app.post("/login", (req, res) => {
  */
 app.post("/addStudent", (req, res) => {
     const { name, roll, department } = req.body;
-
-    const cmd = `java -cp ../java-backend AttendanceDB addStudent ${name} ${roll} ${department}`;
+    // Quote arguments to handle spaces in names
+    const cmd = `java -cp "../java-backend;../java-backend/postgresql.jar" AttendanceDB addStudent "${name}" "${roll}" "${department}"`;
 
     exec(cmd, (err, stdout) => {
+        console.log("Java Output:", stdout);
         if (stdout.includes("STUDENT_ADDED")) {
             res.render("attendance", { msg: "Student added successfully" });
         } else {
-            res.render("attendance", { msg: "Error adding student" });
+            res.render("attendance", { msg: "Error adding student (Duplicate Roll No?)" });
         }
     });
 });
@@ -99,10 +107,10 @@ app.post("/addStudent", (req, res) => {
  */
 app.post("/markAttendance", (req, res) => {
     const { roll, present } = req.body;
-
-    const cmd = `java -cp ../java-backend AttendanceDB markAttendance ${roll} ${present}`;
+    const cmd = `java -cp "../java-backend;../java-backend/postgresql.jar" AttendanceDB markAttendance "${roll}" "${present}"`;
 
     exec(cmd, (err, stdout) => {
+        console.log("Java Output:", stdout);
         if (stdout.includes("ATTENDANCE_MARKED")) {
             res.render("attendance", { msg: "Attendance marked successfully" });
         } else {
