@@ -3,3 +3,4 @@
 3,Ramesh,cse,3
 4,dhanush,cse,3
 5,Rohan,cse,3
+6,nithin,cse,3
